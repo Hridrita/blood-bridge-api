@@ -6,16 +6,20 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Validation Global Pipe
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe());
 
-  // Swagger Documentation Setup
   const config = new DocumentBuilder()
-    .setTitle('BloodBridge API')
-    .setDescription('Smart Blood Donation Management System API')
+    .setTitle('🩸 BloodBridge API')
+    .setDescription(
+      'Smart Blood Donation Management System - Connecting donors with lives.',
+    )
     .setVersion('1.0')
+    .addTag('Auth')
+    .addTag('Users')
+    .addTag('Blood Requests')
     .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

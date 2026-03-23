@@ -21,10 +21,10 @@ export class User {
   password: string;
 
   @Column()
-  bloodGroup: string; // যেমন: A+, B-, O+
+  bloodGroup: string;
 
   @Column()
-  area: string; // যেমন: Dhanmondi, Banani
+  area: string;
 
   @Column({
     type: 'enum',
