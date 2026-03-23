@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
@@ -15,15 +15,17 @@ export class BloodRequest {
   @Column()
   location: string;
 
-  @Column()
+  @Column({ length: 11 , nullable: true}) // ডাটাবেজ লেভেলে লেন্থ সেট করা
   contactNumber: string;
 
   @Column({ default: 'pending' })
-  status: string; 
+  status: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User)
-  requester: User; 
+  // এখানে requesterId-র বদলে সরাসরি ইউজার অবজেক্ট আসবে
+  @ManyToOne(() => User, { eager: true }) // eager: true দিলে সবসময় নামসহ ডাটা আসবে
+  @JoinColumn({ name: 'requesterName' }) // কলামের নাম requesterId থেকে বদলে requesterName করা হলো
+  requester: User;
 }

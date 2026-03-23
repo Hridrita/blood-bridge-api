@@ -2,7 +2,8 @@ import { Controller, Post, Body, Get, Query, Patch, UseGuards, Request } from '@
 import { UsersService } from './users.service';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // পাথটি আপনার প্রজেক্ট অনুযায়ী চেক করে নিন
+import { UpdateUserDto } from './dto/update-user.dto'; // DTO ইম্পোর্ট নিশ্চিত করুন
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Auth & Users')
 @Controller('users')
@@ -17,13 +18,13 @@ export class UsersController {
   }
 
   // লগইন করা ইউজারের নিজের প্রোফাইল আপডেট
-  @ApiBearerAuth() // এটি Swagger-এ তালা আইকন দেখাবে
-  @UseGuards(JwtAuthGuard) // এটি নিশ্চিত করবে যে ইউজার লগইন করা আছে
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch('profile')
   @ApiOperation({ summary: 'Update my own profile' })
-  updateMyProfile(@Request() req, @Body() updateData: any) {
-    // req.user.sub আসছে JWT টোকেন থেকে (আপনার ইউজার আইডি)
-    return this.usersService.updateProfile(req.user.sub, updateData);
+  updateMyProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    // এখানে @Body() এর পরে UpdateUserDto ব্যবহার করা হয়েছে যাতে Swagger-এ বক্স আসে
+    return this.usersService.updateProfile(req.user.sub, updateUserDto);
   }
 
   // সব ইউজারদের লিস্ট দেখার জন্য
@@ -33,7 +34,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  // ডোনার সার্চ করার জন্য (এটি পাবলিক রাখা হয়েছে, তালা নেই)
+  // ডোনার সার্চ করার জন্য
   @Get('search')
   @ApiOperation({ summary: 'Search for blood donors' })
   search(@Query('bloodGroup') bloodGroup: string, @Query('area') area: string) {

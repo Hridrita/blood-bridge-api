@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm'; 
 import { User } from './entities/user.entity';
@@ -30,22 +30,26 @@ export class UsersService {
       password: hashedPassword,
     });
 
+    // ডাটাবেজে সেভ নিশ্চিত করতে await ব্যবহার করা হয়েছে
     const savedUser = await this.usersRepository.save(newUser) as any;
 
-// এখন খুব সহজেই পাসওয়ার্ড বাদ দিয়ে বাকিটা রিটার্ন করতে পারবেন
-const { password: _, ...result } = savedUser; 
-return result;
+    const { password: _, ...result } = savedUser; 
+    return result;
   }
 
-  // প্রোফাইল আপডেট করার লজিক
+  // প্রোফাইল আপডেট করার লজিক (৫০০ এরর ফিক্সড)
   async updateProfile(id: number, updateData: any) {
+    if (!id) {
+      throw new BadRequestException('User ID is required for update!');
+    }
+
     // ১. ইউজার আছে কি না চেক করা
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found!');
     }
 
-    // ২. পাসওয়ার্ড আপডেট করতে চাইলে হ্যাশ করা
+    // ২. পাসওয়ার্ড আপডেট করতে চাইলে হ্যাশ করা
     if (updateData.password && updateData.password.trim() !== '') {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     } else {
@@ -56,23 +60,24 @@ return result;
     delete updateData.id;
     delete updateData.email; 
 
+    // ৪. ডাটাবেজ আপডেট নিশ্চিত করা
     await this.usersRepository.update(id, updateData);
 
-    // আপডেট শেষে নতুন ডাটা রিটার্ন
+    // আপডেট শেষে নতুন ডাটা রিটার্ন (contactNumber সহ)
     return await this.usersRepository.findOne({ 
       where: { id },
-      select: ['id', 'fullName', 'email', 'bloodGroup', 'area', 'role'] 
+      select: ['id', 'fullName', 'email', 'bloodGroup', 'area', 'role', 'contactNumber'] 
     });
   }
 
   // সব ইউজার দেখার জন্য
   async findAll(): Promise<any[]> {
     return await this.usersRepository.find({
-        select: ['id', 'fullName', 'email', 'bloodGroup', 'area', 'role']
+        select: ['id', 'fullName', 'email', 'bloodGroup', 'area', 'role', 'contactNumber']
     });
   }
 
-  // ইমেইল দিয়ে ইউজার খোঁজা
+  // ইমেইল দিয়ে ইউজার খোঁজা
   async findByEmail(email: string): Promise<any> {
     return await this.usersRepository.findOne({ where: { email } });
   }
@@ -91,7 +96,7 @@ return result;
 
     return this.usersRepository.find({
       where: query,
-      select: ['id', 'fullName', 'bloodGroup', 'area', 'email'] 
+      select: ['id', 'fullName', 'bloodGroup', 'area', 'email', 'contactNumber'] 
     });
   }
 }

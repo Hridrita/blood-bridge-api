@@ -33,8 +33,8 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ type: 'timestamp', nullable: true })
-  lastDonationDate: Date;
+  @Column({ nullable: true }) // যদি কলামটি খালি রাখা যায়
+contactNumber: string;
 
   @Column({ default: true })
   isAvailable: boolean;
