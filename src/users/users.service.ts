@@ -11,12 +11,13 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(userData: any): Promise<User> {
+  async create(userData: any): Promise<any> {
     const { email, password } = userData;
 
     const existingUser = await this.usersRepository.findOne({
       where: { email },
     });
+
     if (existingUser) {
       throw new ConflictException('Email already exists!');
     }
@@ -28,10 +29,15 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    return this.usersRepository.save(newUser);
+    return await this.usersRepository.save(newUser);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll(): Promise<any[]> {
+    return await this.usersRepository.find();
+  }
+
+  async findByEmail(email: string): Promise<any> {
+    const user = await this.usersRepository.findOne({ where: { email } });
+    return user;
   }
 }
