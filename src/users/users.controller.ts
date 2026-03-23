@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -19,4 +19,9 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
+
+  @Get('search')
+search(@Query('bloodGroup') bloodGroup: string, @Query('area') area: string) {
+  return this.usersService.searchDonors(bloodGroup, area);
+}
 }
