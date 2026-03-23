@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: 'SECRET_KEY_123', // রিয়েল প্রজেক্টে এটি .env ফাইলে থাকে
+      secret: 'SECRET_KEY_123',
       signOptions: { expiresIn: '1h' },
     }),
   ],

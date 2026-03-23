@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, UseGuards, Request, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Request,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { BloodRequestsService } from './blood-requests.service';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CreateBloodRequestDto } from './dto/create-blood-request.dto';
@@ -13,14 +22,14 @@ export class BloodRequestsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Create single or multiple blood requests' })
-  // Swagger-এ যাতে অ্যারে ইনপুট দেওয়ার বক্স আসে তার জন্য ApiBody যোগ করা হয়েছে
-  @ApiBody({ 
-    type: CreateBloodRequestDto, 
+
+  //array input box
+  @ApiBody({
+    type: CreateBloodRequestDto,
     isArray: true,
-    description: 'Send a single object or an array of objects' 
+    description: 'Send a single object or an array of objects',
   })
   create(@Body() createDto: any, @Request() req) {
-    // এখানে টাইপ 'any' রাখা হয়েছে যাতে এটি Array এবং Object উভয়ই গ্রহণ করতে পারে
     return this.bloodRequestsService.create(createDto, req.user);
   }
 

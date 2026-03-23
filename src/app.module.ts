@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { BloodRequestsModule } from './blood-requests/blood-requests.module'; // এটিও যোগ করুন
+import { BloodRequestsModule } from './blood-requests/blood-requests.module';
 import { User } from './users/entities/user.entity';
-import { BloodRequest } from './blood-requests/entities/blood-request.entity'; // এই সেই লাইন!
+import { BloodRequest } from './blood-requests/entities/blood-request.entity';
 
 @Module({
   imports: [
@@ -13,14 +13,14 @@ import { BloodRequest } from './blood-requests/entities/blood-request.entity'; /
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'marakhabo', // আপনার পাসওয়ার্ড
+      password: 'marakhabo',
       database: 'blood_bridge_db',
-      entities: [User, BloodRequest], // এখন আর এরর দিবে না
+      entities: [User, BloodRequest],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
-    BloodRequestsModule, // মডিউলটিও এখানে থাকতে হবে
+    BloodRequestsModule,
   ],
 })
 export class AppModule {}

@@ -33,8 +33,8 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ nullable: true }) // যদি কলামটি খালি রাখা যায়
-contactNumber: string;
+  @Column({ nullable: true }) // if colomn is empty
+  contactNumber: string;
 
   @Column({ default: true })
   isAvailable: boolean;

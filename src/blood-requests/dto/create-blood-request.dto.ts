@@ -22,5 +22,5 @@ export class CreateBloodRequestDto {
   @IsString()
   @Length(11, 11, { message: 'Contact number must be exactly 11 digits' })
   @Matches(/^01[3-9]\d{8}$/, { message: 'Invalid Bangladeshi contact number' })
-  contactNumber: string; // এটি শুধুমাত্র একবারই থাকবে
+  contactNumber: string;
 }

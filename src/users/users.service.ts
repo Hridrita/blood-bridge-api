@@ -1,6 +1,11 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm'; 
+import { Repository, Like } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 
@@ -11,7 +16,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  // নতুন ইউজার রেজিস্ট্রেশন
+  // user registration
   async create(userData: any): Promise<any> {
     const { email, password } = userData;
 
@@ -30,73 +35,95 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    // ডাটাবেজে সেভ নিশ্চিত করতে await ব্যবহার করা হয়েছে
-    const savedUser = await this.usersRepository.save(newUser) as any;
+    // using await to ensure that the data saved in database
+    const savedUser = (await this.usersRepository.save(newUser)) as any;
 
-    const { password: _, ...result } = savedUser; 
+    const { password: _, ...result } = savedUser;
     return result;
   }
 
-  // প্রোফাইল আপডেট করার লজিক (৫০০ এরর ফিক্সড)
+  // profile update logic
   async updateProfile(id: number, updateData: any) {
     if (!id) {
       throw new BadRequestException('User ID is required for update!');
     }
 
-    // ১. ইউজার আছে কি না চেক করা
+    // if user exit or not check
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found!');
     }
 
-    // ২. পাসওয়ার্ড আপডেট করতে চাইলে হ্যাশ করা
+    // pass update with hash
     if (updateData.password && updateData.password.trim() !== '') {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     } else {
-      delete updateData.password; 
+      delete updateData.password;
     }
 
-    // ৩. সেনসিটিভ ফিল্ড আপডেট হওয়া থেকে আটকানো
     delete updateData.id;
-    delete updateData.email; 
+    delete updateData.email;
 
-    // ৪. ডাটাবেজ আপডেট নিশ্চিত করা
+    // update datbase
     await this.usersRepository.update(id, updateData);
 
-    // আপডেট শেষে নতুন ডাটা রিটার্ন (contactNumber সহ)
-    return await this.usersRepository.findOne({ 
+    // after update return new data
+    return await this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'fullName', 'email', 'bloodGroup', 'area', 'role', 'contactNumber'] 
+      select: [
+        'id',
+        'fullName',
+        'email',
+        'bloodGroup',
+        'area',
+        'role',
+        'contactNumber',
+      ],
     });
   }
 
-  // সব ইউজার দেখার জন্য
+  // to see all user
   async findAll(): Promise<any[]> {
     return await this.usersRepository.find({
-        select: ['id', 'fullName', 'email', 'bloodGroup', 'area', 'role', 'contactNumber']
+      select: [
+        'id',
+        'fullName',
+        'email',
+        'bloodGroup',
+        'area',
+        'role',
+        'contactNumber',
+      ],
     });
   }
 
-  // ইমেইল দিয়ে ইউজার খোঁজা
+  //find user using email
   async findByEmail(email: string): Promise<any> {
     return await this.usersRepository.findOne({ where: { email } });
   }
 
-  // ডোনার সার্চ করার লজিক
+  // doner serach logic
   async searchDonors(bloodGroup?: string, area?: string) {
-    const query: any = { role: 'donor' }; 
+    const query: any = { role: 'donor' };
 
     if (bloodGroup) {
       query.bloodGroup = bloodGroup;
     }
 
     if (area) {
-      query.area = Like(`%${area}%`); 
+      query.area = Like(`%${area}%`);
     }
 
     return this.usersRepository.find({
       where: query,
-      select: ['id', 'fullName', 'bloodGroup', 'area', 'email', 'contactNumber'] 
+      select: [
+        'id',
+        'fullName',
+        'bloodGroup',
+        'area',
+        'email',
+        'contactNumber',
+      ],
     });
   }
 }
