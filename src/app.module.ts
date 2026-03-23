@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module'; 
+import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -13,10 +13,11 @@ import { UsersModule } from './users/users.module';
       username: 'postgres',
       password: 'marakhabo', 
       database: 'blood_bridge_db',
-      autoLoadEntities: true,
-      synchronize: true, 
+      entities: [User],
+      synchronize: true,
     }),
     UsersModule,
+    AuthModule, 
   ],
 })
 export class AppModule {}
