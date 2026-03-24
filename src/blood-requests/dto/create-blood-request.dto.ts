@@ -17,7 +17,7 @@ export class CreateBloodRequestDto {
   @IsString()
   location: string;
 
-  @ApiProperty({ example: '01712345678' })
+  @ApiProperty({ example: '01234567890' })
   @IsNotEmpty()
   @IsString()
   @Length(11, 11, { message: 'Contact number must be exactly 11 digits' })
