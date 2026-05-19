@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -87,18 +88,13 @@ export class BloodRequestsService {
   }
 
   //request delete
-  async remove(id: number, userId: number) {
-    const request = await this.bloodRequestRepository.findOne({
-      where: { id, requester: { id: userId } },
-    });
+async remove(id: number, userId: number, userRole: string) {
+    const deletedRequest = await this.bloodRequestRepository.delete(id);
 
-    if (!request) {
-      throw new NotFoundException(
-        'Blood request not found or you are not authorized to delete this!',
-      );
-    }
-
-    await this.bloodRequestRepository.remove(request);
-    return { message: `Request with ID ${id} deleted successfully` };
+    if (!deletedRequest) {
+      throw new NotFoundException(`Blood request with ID ${id} not found`);
   }
+
+  return { message: "Request deleted successfully" };
+}
 }

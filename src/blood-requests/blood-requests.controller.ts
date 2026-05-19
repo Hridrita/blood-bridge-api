@@ -12,6 +12,8 @@ import { BloodRequestsService } from './blood-requests.service';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CreateBloodRequestDto } from './dto/create-blood-request.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../guards/roles.decorator';
 
 @ApiTags('Blood Requests')
 @ApiBearerAuth()
@@ -46,10 +48,10 @@ export class BloodRequestsController {
     return this.bloodRequestsService.findMyRequests(req.user.sub);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a blood request' })
   remove(@Param('id') id: string, @Request() req) {
-    return this.bloodRequestsService.remove(+id, req.user.sub);
+    return this.bloodRequestsService.remove(Number(id), req.user.sub, req.user.role);
   }
 }

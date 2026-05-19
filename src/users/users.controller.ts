@@ -42,7 +42,14 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async getProfile(@Request() req:any) {
+    return this.usersService.findOne(req.user.sub); 
+  }
+
   // to search donar
+  @UseGuards(JwtAuthGuard)
   @Get('search')
   @ApiOperation({ summary: 'Search for blood donors' })
   search(@Query('bloodGroup') bloodGroup: string, @Query('area') area: string) {

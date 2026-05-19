@@ -30,12 +30,14 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const assignedRole = email === 'admin@gmail.com' ? 'admin' : 'donor';
+
     const newUser = this.usersRepository.create({
       ...userData,
       password: hashedPassword,
+      role: assignedRole,
     });
 
-    // using await to ensure that the data saved in database
     const savedUser = (await this.usersRepository.save(newUser)) as any;
 
     const { password: _, ...result } = savedUser;
@@ -97,6 +99,14 @@ export class UsersService {
     });
   }
 
+  // src/users/users.service.ts
+
+  async findOne(id: number) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    console.log('Fetched User:', user);
+    return user;
+  }
+
   //find user using email
   async findByEmail(email: string): Promise<any> {
     return await this.usersRepository.findOne({ where: { email } });
@@ -104,7 +114,7 @@ export class UsersService {
 
   // doner serach logic
   async searchDonors(bloodGroup?: string, area?: string) {
-    const query: any = { role: 'donor' };
+    const query: any = {};
 
     if (bloodGroup) {
       query.bloodGroup = bloodGroup;
